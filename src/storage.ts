@@ -8,7 +8,7 @@ const DEFAULT_SETTINGS: Settings = {
   dialect: "la",
   level: "s3",
   mode: "voice",
-  userName: "Maya R.",
+  userName: "chuggleton dinkleberry",
 };
 
 export function loadSettings(): Settings {
