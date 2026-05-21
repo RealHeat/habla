@@ -65,6 +65,41 @@ export function generateReflexivePrompt({
   ].join("\n");
 }
 
+export function generateVocabPrompt({
+  prompt,
+  level,
+  dialect,
+  count,
+}: {
+  prompt: string;
+  level: LevelId;
+  dialect: Dialect;
+  count: number;
+}): string {
+  const topicLine = prompt.trim()
+    ? `Build the vocabulary list around this topic / theme / list: """${prompt}"""`
+    : `No topic provided — pick a varied mix of useful, level-appropriate vocabulary (nouns, verbs, adjectives, and a few common expressions).`;
+
+  return [
+    `You are a Spanish teacher generating a VOCABULARY list for a US high school student at the ${levelName(level)} level.`,
+    `Use ${dialectName(dialect)} Spanish. Produce EXACTLY ${count} vocabulary items.`,
+    `Calibrate difficulty to the level. Avoid trivially obvious cognates (e.g. "animal" → "animal") unless absolutely necessary.`,
+    `If the student provides a list of specific words, use those words verbatim as the "term" values.`,
+    ``,
+    topicLine,
+    ``,
+    `Each item must have:`,
+    `- "term": the Spanish word or short phrase being taught (lowercase unless it's a proper noun). Include any reflexive -se or article if it clarifies gender (e.g. "el agua", "ducharse").`,
+    `- "translation": a concise English translation. If multiple meanings exist, give the most common one for this level.`,
+    `- "partOfSpeech": one of "noun", "verb", "adjective", "adverb", "expression", "preposition", "conjunction".`,
+    `- "example": a short Spanish sentence (6–14 words) that uses the term naturally.`,
+    `- "exampleEn": the English translation of that example sentence.`,
+    `- "distractors": EXACTLY 3 plausible-but-WRONG English translations for multiple-choice. They must be different from each other and from the correct translation. Pick distractors that are the same part of speech and roughly the same difficulty — close enough to make the student think, not random unrelated words.`,
+    ``,
+    `Make sure every "term" is unique within the list.`,
+  ].join("\n");
+}
+
 export function gradeAnswerPrompt({
   question,
   answer,

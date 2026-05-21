@@ -14,6 +14,7 @@ export type Route =
   | "history"
   | "settings"
   | "reflexive"
+  | "vocab"
   | "guide";
 
 export type ReflexiveExercise = {
@@ -21,6 +22,17 @@ export type ReflexiveExercise = {
   verb: string;
   answer: string;
   en?: string;
+};
+
+export type VocabFormat = "mc" | "free";
+
+export type VocabExercise = {
+  term: string;
+  translation: string;
+  partOfSpeech?: string;
+  example?: string;
+  exampleEn?: string;
+  distractors: string[];
 };
 
 export type Settings = {

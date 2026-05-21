@@ -10,6 +10,7 @@ import { Summary } from "./screens/Summary";
 import { History } from "./screens/History";
 import { Settings } from "./screens/Settings";
 import { Reflexive } from "./screens/Reflexive";
+import { Vocab } from "./screens/Vocab";
 import { Guide } from "./screens/Guide";
 import { LEVELS, SAMPLE_QUESTIONS } from "./data";
 import { loadSettings, saveSession, saveSettings } from "./storage";
@@ -194,6 +195,15 @@ export default function App() {
   } else if (route === "reflexive") {
     screen = (
       <Reflexive
+        apiKey={settings.apiKey}
+        level={settings.level}
+        dialect={settings.dialect}
+        onNeedKey={() => go("settings")}
+      />
+    );
+  } else if (route === "vocab") {
+    screen = (
+      <Vocab
         apiKey={settings.apiKey}
         level={settings.level}
         dialect={settings.dialect}

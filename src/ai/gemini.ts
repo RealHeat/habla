@@ -1,5 +1,17 @@
-import { generateQuestionsPrompt, generateReflexivePrompt, gradeAnswerPrompt } from "./prompts";
-import type { Dialect, Feedback, LevelId, Question, ReflexiveExercise } from "../types";
+import {
+  generateQuestionsPrompt,
+  generateReflexivePrompt,
+  generateVocabPrompt,
+  gradeAnswerPrompt,
+} from "./prompts";
+import type {
+  Dialect,
+  Feedback,
+  LevelId,
+  Question,
+  ReflexiveExercise,
+  VocabExercise,
+} from "../types";
 
 // Gemini 1.5 models were removed from v1beta in early 2026, so this chain
 // targets the currently-supported families. Order: cheapest/fastest first.
@@ -78,6 +90,31 @@ const REFLEXIVE_SCHEMA = {
     },
   },
   required: ["exercises"],
+};
+
+const VOCAB_SCHEMA = {
+  type: "object",
+  properties: {
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          term: { type: "string" },
+          translation: { type: "string" },
+          partOfSpeech: { type: "string" },
+          example: { type: "string" },
+          exampleEn: { type: "string" },
+          distractors: {
+            type: "array",
+            items: { type: "string" },
+          },
+        },
+        required: ["term", "translation", "distractors"],
+      },
+    },
+  },
+  required: ["items"],
 };
 
 const SEGMENT_SCHEMA = {
@@ -223,6 +260,33 @@ export async function generateReflexiveExercises(args: {
     throw new AIError("Gemini didn't return any exercises. Try again or pick a different topic.");
   }
   return xs.slice(0, args.count);
+}
+
+export async function generateVocabExercises(args: {
+  apiKey: string;
+  prompt: string;
+  level: LevelId;
+  dialect: Dialect;
+  count: number;
+}): Promise<VocabExercise[]> {
+  const payload = await callGemini<{ items: VocabExercise[] }>({
+    apiKey: args.apiKey,
+    prompt: generateVocabPrompt(args),
+    schema: VOCAB_SCHEMA,
+  });
+
+  const items = (payload.items || [])
+    .filter((x) => x && x.term && x.translation && Array.isArray(x.distractors))
+    .map((x) => ({
+      ...x,
+      distractors: x.distractors.filter((d) => d && d !== x.translation).slice(0, 3),
+    }))
+    .filter((x) => x.distractors.length >= 3);
+
+  if (items.length === 0) {
+    throw new AIError("Gemini didn't return any vocabulary. Try again or pick a different topic.");
+  }
+  return items.slice(0, args.count);
 }
 
 export async function gradeAnswer(args: {
