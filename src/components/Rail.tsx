@@ -19,6 +19,8 @@ const ROUTES: RailRoute[] = [
   { id: "review", label: "Review", icon: "Doc", section: "Practice", flow: 3, sub: true },
   { id: "practice", label: "Practice", icon: "Play", section: "Practice", flow: 4, sub: true },
   { id: "summary", label: "Results", icon: "Star", section: "Practice", flow: 5, sub: true },
+  { id: "reflexive", label: "Reflexive verbs", icon: "Bolt", section: "Practice" },
+  { id: "guide", label: "Study guide", icon: "School", section: "Library" },
   { id: "history", label: "History", icon: "History", section: "Library" },
   { id: "settings", label: "Settings", icon: "Settings", section: "Account" },
 ];

@@ -1,5 +1,5 @@
-import { generateQuestionsPrompt, gradeAnswerPrompt } from "./prompts";
-import type { Dialect, Feedback, LevelId, Question } from "../types";
+import { generateQuestionsPrompt, generateReflexivePrompt, gradeAnswerPrompt } from "./prompts";
+import type { Dialect, Feedback, LevelId, Question, ReflexiveExercise } from "../types";
 
 // Gemini 1.5 models were removed from v1beta in early 2026, so this chain
 // targets the currently-supported families. Order: cheapest/fastest first.
@@ -58,6 +58,26 @@ const QUESTIONS_SCHEMA = {
     },
   },
   required: ["questions"],
+};
+
+const REFLEXIVE_SCHEMA = {
+  type: "object",
+  properties: {
+    exercises: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          sentence: { type: "string" },
+          verb: { type: "string" },
+          answer: { type: "string" },
+          en: { type: "string" },
+        },
+        required: ["sentence", "verb", "answer", "en"],
+      },
+    },
+  },
+  required: ["exercises"],
 };
 
 const SEGMENT_SCHEMA = {
@@ -181,6 +201,28 @@ export async function generateQuestions(args: {
     throw new AIError("Gemini didn't return any questions. Try a different topic.");
   }
   return qs.slice(0, args.count);
+}
+
+export async function generateReflexiveExercises(args: {
+  apiKey: string;
+  prompt: string;
+  level: LevelId;
+  dialect: Dialect;
+  count: number;
+}): Promise<ReflexiveExercise[]> {
+  const payload = await callGemini<{ exercises: ReflexiveExercise[] }>({
+    apiKey: args.apiKey,
+    prompt: generateReflexivePrompt(args),
+    schema: REFLEXIVE_SCHEMA,
+  });
+
+  const xs = (payload.exercises || []).filter(
+    (x) => x && x.sentence && x.answer && x.verb && x.sentence.includes("____"),
+  );
+  if (xs.length === 0) {
+    throw new AIError("Gemini didn't return any exercises. Try again or pick a different topic.");
+  }
+  return xs.slice(0, args.count);
 }
 
 export async function gradeAnswer(args: {

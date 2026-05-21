@@ -9,6 +9,8 @@ import { Practice } from "./screens/Practice";
 import { Summary } from "./screens/Summary";
 import { History } from "./screens/History";
 import { Settings } from "./screens/Settings";
+import { Reflexive } from "./screens/Reflexive";
+import { Guide } from "./screens/Guide";
 import { LEVELS, SAMPLE_QUESTIONS } from "./data";
 import { loadSettings, saveSession, saveSettings } from "./storage";
 import type { Answer, Question, Route, Settings as SettingsT, StoredSession } from "./types";
@@ -189,6 +191,17 @@ export default function App() {
     );
   } else if (route === "settings") {
     screen = <Settings settings={settings} onChange={updateSettings} />;
+  } else if (route === "reflexive") {
+    screen = (
+      <Reflexive
+        apiKey={settings.apiKey}
+        level={settings.level}
+        dialect={settings.dialect}
+        onNeedKey={() => go("settings")}
+      />
+    );
+  } else if (route === "guide") {
+    screen = <Guide initialLevel={settings.level} />;
   }
 
   return (

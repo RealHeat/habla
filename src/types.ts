@@ -12,7 +12,16 @@ export type Route =
   | "practice"
   | "summary"
   | "history"
-  | "settings";
+  | "settings"
+  | "reflexive"
+  | "guide";
+
+export type ReflexiveExercise = {
+  sentence: string;
+  verb: string;
+  answer: string;
+  en?: string;
+};
 
 export type Settings = {
   apiKey: string;

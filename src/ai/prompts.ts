@@ -33,6 +33,38 @@ export function generateQuestionsPrompt({
   ].join("\n");
 }
 
+export function generateReflexivePrompt({
+  prompt,
+  level,
+  dialect,
+  count,
+}: {
+  prompt: string;
+  level: LevelId;
+  dialect: Dialect;
+  count: number;
+}): string {
+  const topicLine = prompt.trim()
+    ? `Focus the exercises on this topic / set of verbs: """${prompt}"""`
+    : `No topic provided — pick a varied mix of the most common reflexive verbs for this level (e.g. despertarse, levantarse, ducharse, vestirse, lavarse, cepillarse, peinarse, sentarse, acostarse, dormirse, divertirse, enojarse, sentirse, ponerse, irse, quitarse).`;
+
+  return [
+    `You are a Spanish teacher generating REFLEXIVE-VERB fill-in-the-blank exercises for a US high school student at the ${levelName(level)} level.`,
+    `Use ${dialectName(dialect)} Spanish. Produce EXACTLY ${count} exercises. Vary the subject pronouns (yo, tú, él/ella, nosotros, vosotros/ustedes, ellos) — don't always use "yo".`,
+    `Calibrate tense to the level: ES 1 = present indicative only. ES 2 = present + preterite + imperfect. ES 3+ = also include the subjunctive, commands, or compound tenses where natural.`,
+    ``,
+    topicLine,
+    ``,
+    `Each exercise must have:`,
+    `- "sentence": a Spanish sentence with a blank written as exactly four underscores: "____" — the blank stands in for the conjugated reflexive verb PLUS its reflexive pronoun (e.g. "me lavo", "se durmió"). Only one blank per sentence.`,
+    `- "verb": the infinitive form including -se (e.g. "despertarse", "lavarse").`,
+    `- "answer": the exact string that fills the blank — pronoun + conjugated verb, lowercase, no surrounding punctuation. E.g. "me despierto", "se durmieron", "nos vestimos".`,
+    `- "en": a short English translation of the FULL completed sentence.`,
+    ``,
+    `Make sure "sentence" with the blank replaced by "answer" reads as natural, grammatical Spanish. Don't put the pronoun outside the blank.`,
+  ].join("\n");
+}
+
 export function gradeAnswerPrompt({
   question,
   answer,

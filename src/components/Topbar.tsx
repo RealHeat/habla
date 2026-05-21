@@ -10,6 +10,8 @@ const LABELS: Record<Route, string[]> = {
   summary: ["Habla", "Session", "Results"],
   history: ["Habla", "History"],
   settings: ["Habla", "Settings"],
+  reflexive: ["Habla", "Reflexive verbs"],
+  guide: ["Habla", "Study guide"],
 };
 
 export function Topbar({ route }: { route: Route }) {
