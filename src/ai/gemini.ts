@@ -1,12 +1,14 @@
 import {
   generateQuestionsPrompt,
   generateReflexivePrompt,
+  generateStudyGuidePrompt,
   generateVocabPrompt,
   gradeAnswerPrompt,
 } from "./prompts";
 import type {
   Dialect,
   Feedback,
+  GeneratedStudyGuide,
   LevelId,
   Question,
   ReflexiveExercise,
@@ -115,6 +117,38 @@ const VOCAB_SCHEMA = {
     },
   },
   required: ["items"],
+};
+
+const ES_EN_SCHEMA = {
+  type: "object",
+  properties: {
+    es: { type: "string" },
+    en: { type: "string" },
+  },
+  required: ["es", "en"],
+};
+
+const STUDY_GUIDE_SCHEMA = {
+  type: "object",
+  properties: {
+    title: { type: "string" },
+    overview: { type: "string" },
+    sections: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          items: { type: "array", items: { type: "string" } },
+        },
+        required: ["title", "items"],
+      },
+    },
+    vocab: { type: "array", items: ES_EN_SCHEMA },
+    examples: { type: "array", items: ES_EN_SCHEMA },
+    tips: { type: "array", items: { type: "string" } },
+  },
+  required: ["title", "overview", "sections", "vocab", "examples", "tips"],
 };
 
 const SEGMENT_SCHEMA = {
@@ -287,6 +321,36 @@ export async function generateVocabExercises(args: {
     throw new AIError("Gemini didn't return any vocabulary. Try again or pick a different topic.");
   }
   return items.slice(0, args.count);
+}
+
+export async function generateStudyGuide(args: {
+  apiKey: string;
+  notes: string;
+  level: LevelId;
+  dialect: Dialect;
+}): Promise<GeneratedStudyGuide> {
+  const guide = await callGemini<GeneratedStudyGuide>({
+    apiKey: args.apiKey,
+    prompt: generateStudyGuidePrompt(args),
+    schema: STUDY_GUIDE_SCHEMA,
+  });
+
+  const sections = (guide.sections || [])
+    .filter((s) => s && s.title && Array.isArray(s.items) && s.items.length > 0)
+    .map((s) => ({ title: s.title, items: s.items.filter(Boolean) }));
+
+  if (!guide.overview || sections.length === 0) {
+    throw new AIError("Gemini didn't return a usable study guide. Try adding more detail.");
+  }
+
+  return {
+    title: guide.title || "Study guide",
+    overview: guide.overview,
+    sections,
+    vocab: (guide.vocab || []).filter((v) => v && v.es && v.en),
+    examples: (guide.examples || []).filter((e) => e && e.es && e.en),
+    tips: (guide.tips || []).filter(Boolean),
+  };
 }
 
 export async function gradeAnswer(args: {

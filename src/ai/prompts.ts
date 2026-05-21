@@ -100,6 +100,41 @@ export function generateVocabPrompt({
   ].join("\n");
 }
 
+export function generateStudyGuidePrompt({
+  notes,
+  level,
+  dialect,
+}: {
+  notes: string;
+  level: LevelId;
+  dialect: Dialect;
+}): string {
+  return [
+    `You are a Spanish teacher turning a student's raw material into a structured study guide.`,
+    `The student is at the ${levelName(level)} level and uses ${dialectName(dialect)} Spanish.`,
+    `Calibrate explanations to their level — define unfamiliar grammar terms, but don't over-explain basics they already know.`,
+    ``,
+    `Read the material below and produce a study guide in JSON with these fields:`,
+    `- "title": a short, descriptive title for this study guide (4–8 words).`,
+    `- "overview": 2–4 sentences summarizing what this material covers and what the student should walk away knowing.`,
+    `- "sections": 3–6 thematic sections. Each section has a "title" (e.g. "Key grammar", "Verb conjugations", "Cultural context", "Common mistakes") and an "items" array of 3–8 concise bullet points. Prefer concrete rules and patterns over abstract description.`,
+    `- "vocab": 6–14 important vocabulary items from the material. Each is {"es": "...", "en": "..."}. Use the form that appears in the material (lowercase unless proper noun).`,
+    `- "examples": 3–6 example Spanish sentences that illustrate the most important grammar or vocabulary from the material. Each is {"es": "...", "en": "..."}.`,
+    `- "tips": 2–5 short study tips or memory aids ("notice that…", "watch out for…", "remember the trigger…").`,
+    ``,
+    `Rules:`,
+    `- Base every section, vocab item, example, and tip on the material the student provided. Do NOT invent unrelated content.`,
+    `- If the material is in English (e.g. textbook notes), translate Spanish examples and vocab to use ${dialectName(dialect)} forms.`,
+    `- If the material is sparse or off-topic, still produce a usable guide focused on what is there; mention in the overview that the source was brief.`,
+    `- Keep bullets tight. No filler like "this is important" — just the rule, pattern, or fact.`,
+    ``,
+    `Material:`,
+    `"""`,
+    notes,
+    `"""`,
+  ].join("\n");
+}
+
 export function gradeAnswerPrompt({
   question,
   answer,

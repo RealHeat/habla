@@ -12,6 +12,7 @@ const LABELS: Record<Route, string[]> = {
   settings: ["Habla", "Settings"],
   reflexive: ["Habla", "Reflexive verbs"],
   vocab: ["Habla", "Vocabulary"],
+  notes: ["Habla", "Notes → Study guide"],
   guide: ["Habla", "Study guide"],
 };
 

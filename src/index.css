@@ -594,7 +594,7 @@ h3.sub {
   flex: 1;
   border-radius: 2px;
   background: var(--bg-elev-2);
-  transition: background 200ms;
+  transition: background 420ms cubic-bezier(.22,.61,.36,1);
 }
 .progress i[data-state="done"] { background: var(--accent); }
 .progress i[data-state="cur"]  { background: color-mix(in oklab, var(--accent) 70%, var(--bg-elev-2)); }
@@ -668,7 +668,7 @@ h3.sub {
   border-radius: 999px;
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
-  transition: left 180ms cubic-bezier(.3,.7,.4,1), width 180ms;
+  transition: left 340ms cubic-bezier(.22,.61,.36,1), width 340ms cubic-bezier(.22,.61,.36,1);
 }
 
 /* Text answer */
@@ -1130,11 +1130,35 @@ h3.sub {
 
 /* ─── Animations on screen swap ─── */
 .fade-in {
-  animation: fadein 280ms cubic-bezier(.3,.7,.4,1) both;
+  animation: fadein 620ms cubic-bezier(.22,.61,.36,1) both;
 }
 @keyframes fadein {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger inner blocks so the screen settles in waves instead of one snap. */
+.fade-in > * {
+  animation: fadein-soft 720ms cubic-bezier(.22,.61,.36,1) both;
+}
+.fade-in > *:nth-child(1) { animation-delay: 60ms; }
+.fade-in > *:nth-child(2) { animation-delay: 120ms; }
+.fade-in > *:nth-child(3) { animation-delay: 180ms; }
+.fade-in > *:nth-child(4) { animation-delay: 240ms; }
+.fade-in > *:nth-child(5) { animation-delay: 300ms; }
+.fade-in > *:nth-child(6) { animation-delay: 360ms; }
+.fade-in > *:nth-child(7) { animation-delay: 420ms; }
+.fade-in > *:nth-child(n+8) { animation-delay: 480ms; }
+@keyframes fadein-soft {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .fade-in > * {
+    animation: none !important;
+  }
 }
 
 /* ─── Dialect chip ─── */

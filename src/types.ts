@@ -15,6 +15,7 @@ export type Route =
   | "settings"
   | "reflexive"
   | "vocab"
+  | "notes"
   | "guide";
 
 export type ReflexiveExercise = {
@@ -25,6 +26,20 @@ export type ReflexiveExercise = {
 };
 
 export type VocabFormat = "mc" | "free";
+
+export type StudyGuideSection = {
+  title: string;
+  items: string[];
+};
+
+export type GeneratedStudyGuide = {
+  title: string;
+  overview: string;
+  sections: StudyGuideSection[];
+  vocab: { es: string; en: string }[];
+  examples: { es: string; en: string }[];
+  tips: string[];
+};
 
 export type VocabExercise = {
   term: string;
